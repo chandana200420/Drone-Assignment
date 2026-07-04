@@ -115,7 +115,7 @@ Assets/
 1. Clone the repository.
 
 ```
-git clone https://github.com/your-username/Drone-Assignment.git
+git clone https://github.com/chandana200420/Drone-Assignment.git
 ```
 
 2. Open the project in Unity.
