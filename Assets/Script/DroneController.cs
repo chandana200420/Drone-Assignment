@@ -41,40 +41,35 @@ public class DroneController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isArmed)
-        {
-            return;
-        }
+        if (!isArmed) return;
 
         float throttle = 0f;
         if (Input.GetKey(throttleUpKey)) throttle = 1f;
         else if (Input.GetKey(throttleDownKey)) throttle = -1f;
 
-        float pitch = Input.GetAxis("Vertical");     
-        float roll = Input.GetAxis("Horizontal");    
+        float pitch = Input.GetAxis("Vertical");
+        float roll = Input.GetAxis("Horizontal");
 
         float yaw = 0f;
         if (Input.GetKey(yawLeftKey)) yaw -= 1f;
         if (Input.GetKey(yawRightKey)) yaw += 1f;
 
-        
+    
+        rb.AddForce(-Physics.gravity * rb.mass, ForceMode.Force);
+
+      
         rb.AddForce(transform.up * throttle * throttleForce, ForceMode.Force);
 
-        
-        if (Mathf.Approximately(throttle, 0f))
+        if (Mathf.Approximately(throttle, 0f) && Mathf.Approximately(pitch, 0f) && Mathf.Approximately(roll, 0f))
         {
-            Vector3 gravityCompensation = -Physics.gravity * rb.mass;
-            rb.AddForce(gravityCompensation, ForceMode.Force);
-
             Vector3 vel = rb.linearVelocity;
             vel.y *= (1f - hoverDamping * Time.fixedDeltaTime * 10f);
             rb.linearVelocity = vel;
         }
 
-        
         Vector3 torque = new Vector3(pitch * pitchTorque, yaw * yawTorque, -roll * rollTorque);
         rb.AddRelativeTorque(torque, ForceMode.Force);
-        // Self-leveling
+     
         Vector3 currentRotation = transform.eulerAngles;
 
         float pitchAngle = currentRotation.x;
@@ -98,12 +93,14 @@ public class DroneController : MonoBehaviour
     public void Arm()
     {
         isArmed = true;
+        rb.angularVelocity = Vector3.zero;
+        transform.rotation = Quaternion.identity;
     }
 
     public void Disarm()
     {
         isArmed = false;
-        rb.linearVelocity = Vector3.zero;
+        
         rb.angularVelocity = Vector3.zero;
     }
 
